@@ -44,6 +44,21 @@ sub send_interval {
       : $self->_get_opt('send_interval');
 }
 
+=head2 req_per_host
+
+Getter and setter for the C<req_per_host> - the number of requests in
+progress permitted for a given domain.  By default this is set to 1.
+
+=cut
+
+sub req_per_host {
+    my $self = shift;
+    return scalar @_
+      ? $self->_set_opt('req_per_host', @_ )
+      : $self->_get_opt('req_per_host');
+}
+
+
 =head1 OVERLOADED METHODS
 
 These methods are overloaded but otherwise work exactly as the original
@@ -63,6 +78,9 @@ sub new {
     # Set the interval between sends.
     $self->{opts}{send_interval} = 5;    # seconds
     $class->_add_get_set_key('send_interval');
+
+    $self->{opts}{req_per_host} = 1;
+    $class->_add_get_set_key('req_per_host');
 
     $self->_init(@_);
 
@@ -134,7 +152,7 @@ sub _process_to_send {
         # warn        sleep 5;
 
         # Check that this request is good to go.
-        next if $domain_stats->{count};
+        next if ($domain_stats->{count} || 0) >= $self->req_per_host;
         next unless time > ( $domain_stats->{next_send} || 0 );
 
         # We can add this request.
