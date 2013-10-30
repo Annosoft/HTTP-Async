@@ -365,6 +365,26 @@ sub total_count {
     return $count;
 }
 
+
+=head2 clear_send_queue
+
+    $async->clear_send_queue;
+    my $pending = $async->to_send_count; # now zero
+
+Remove all unsent requests.  Returns nothing.
+
+In-progress and complete requests are not modified.
+
+=cut
+
+sub clear_send_queue {
+    my ($self) = @_;
+    @{ $$self{to_send} } = ();
+
+    return;
+}
+
+
 =head2 info
 
     print $async->info;

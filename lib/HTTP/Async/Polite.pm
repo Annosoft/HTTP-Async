@@ -138,6 +138,24 @@ sub to_send_count {
     return $count;
 }
 
+
+=head2 clear_send_queue
+
+Clear also the domain specific queues.
+
+=cut
+
+sub clear_send_queue {
+    my $self = shift;
+
+    @{ $$self{domain_stats}{$_}{to_send} } = ()
+      for keys %{ $$self{domain_stats} };
+
+    # clear also the main queue
+    return $self->SUPER::clear_send_queue;
+}
+
+
 sub _process_to_send {
     my $self = shift;
 
